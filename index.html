@@ -1,76 +1,40 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Réservation Restaurant</title>
-</head>
-<body>
-
-<h1>Réserver une table</h1>
-
-<form id="reservationForm">
-
-  <label>Nom</label><br>
-  <input type="text" name="name" required><br><br>
-
-  <label>Email</label><br>
-  <input type="email" name="email" required><br><br>
-
-  <label>Date</label><br>
-  <input type="date" name="date" required><br><br>
-
-  <label>Heure</label><br>
-  <input type="time" name="time" required><br><br>
-
-  <label>Nombre de personnes</label><br>
-  <input type="number" name="guests" min="1" value="2" required><br><br>
-
-  <button type="submit">Enregistrer</button>
-
+<form>
+  ...
 </form>
 
-
-<!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+const { createClient } = supabase;
 
-  const { createClient } = supabase;
+const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
+const supabaseKey = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey";
 
-  const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
-  const supabaseKey = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey"; // ← mets ta vraie clé ici
+const client = createClient(supabaseUrl, supabaseKey);
 
-  const client = createClient(supabaseUrl, supabaseKey);
+const form = document.querySelector("form");
+const message = document.createElement("p");
+form.appendChild(message);
 
-  const form = document.getElementById("reservationForm");
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-  if (!form) {
-    console.error("Formulaire introuvable !");
-    return;
+  const name = form.querySelector('input[name="name"]').value;
+  const email = form.querySelector('input[name="email"]').value;
+  const date = form.querySelector('input[name="date"]').value;
+  const time = form.querySelector('input[name="time"]').value;
+  const guests = form.querySelector('input[name="guests"]').value;
+
+  const { error } = await client
+    .from("reservations")
+    .insert([{ name, email, date, time, guests }]);
+
+  if (error) {
+    alert("Erreur : " + error.message);
+  } else {
+    alert("Réservation enregistrée !");
+    form.reset();
   }
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = form.querySelector('[name="name"]').value;
-    const email = form.querySelector('[name="email"]').value;
-    const date = form.querySelector('[name="date"]').value;
-    const time = form.querySelector('[name="time"]').value;
-    const guests = form.querySelector('[name="guests"]').value;
-
-    const { error } = await client
-      .from("reservations")
-      .insert([{ name, email, date, time, guests }]);
-
-    if (error) {
-      alert("Erreur : " + error.message);
-    } else {
-      alert("Réservation enregistrée !");
-      form.reset();
-    }
-  });
-
 });
 </script>
 
