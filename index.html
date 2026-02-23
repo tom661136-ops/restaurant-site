@@ -1,98 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Réservation Restaurant</title>
-</head>
-<body>
-
-<h1>Réserver une table</h1>
-
-<p><strong>Acompte : 10 € / personne</strong> (calculé automatiquement)</p>
-
-<form id="reservationForm">
-  <label>Nom</label><br>
-  <input type="text" id="name" required><br><br>
-
-  <label>Email</label><br>
-  <input type="email" id="email" required><br><br>
-
-  <label>Date</label><br>
-  <input type="date" id="date" required><br><br>
-
-  <label>Heure</label><br>
-  <input type="time" id="time" required><br><br>
-
-  <label>Nombre de personnes</label><br>
-  <input type="number" id="guests" value="2" min="1" required><br><br>
-
-  <p>Acompte total : <span id="deposit">20</span> €</p>
-
-  <button type="submit">Enregistrer</button>
-</form>
-
-<p id="message"></p>
-
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
-<script>
-const { createClient } = supabase;
-
-const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5Z214ZHBzYWt6dWJtaWNmcHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NjI0MDAsImV4cCI6MjA4NzQzODQwMH0.tPyu6K0Z5Vkgj4G3dyzhzLYEtwWSTXhp46SJ8V_oi_c";
-
-const client = createClient(supabaseUrl, supabaseKey);
-
-const form = document.getElementById("reservationForm");
-const depositSpan = document.getElementById("deposit");
-const guestsInput = document.getElementById("guests");
-const message = document.getElementById("message");
-
-guestsInput.addEventListener("input", () => {
-  depositSpan.textContent = guestsInput.value * 10;
-});
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  const date = document.getElementById("date").value;
-  const time = document.getElementById("time").value;
-  const guests = parseInt(guestsInput.value);
-
-  const { error } = await client
-    .from("reservations")
-    .insert([
-      { name, email, date, time, guests }
-    ]);
-
-  if (error) {
-    message.textContent = "Erreur : " + error.message;
-  } else {
-    message.textContent = "Réservation enregistrée !";
-    form.reset();
-    depositSpan.textContent = 20;
-  }
-});
-</script>
-<form>
-   ...
-</form>
-
-<!-- SUPABASE ICI -->
+<!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 const { createClient } = supabase;
 
+// 🔗 TON URL SUPABASE
 const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
+
+// 🔑 TA PUBLISHABLE KEY (celle qui commence par sb_publishable_)
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5Z214ZHBzYWt6dWJtaWNmcHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NjI0MDAsImV4cCI6MjA4NzQzODQwMH0.tPyu6K0Z5Vkgj4G3dyzhzLYEtwWSTXhp46SJ8V_oi_c";
 
 const client = createClient(supabaseUrl, supabaseKey);
-</script>
 
-</body>
-</html>
-</body>
-</html>
+// Formulaire
+const form = document.querySelector("form");
+const message = document.createElement("p");
+form.appendChild(message);
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const name = form.querySelector('input[name="name"]').value;
+  const email = form.querySelector('input[name="email"]').value;
+  const date = form.querySelector('input[name="date"]').value;
+  const time = form.querySelector('input[name="time"]').value;
+  const guests = form.querySelector('input[name="guests"]').value;
+
+  const { error } = await client
+    .from("reservations")
+    .insert([{ name, email, date, time, guests }]);
+
+  if (error) {
+    message.textContent = "Erreur : " + error.message;
+    message.style.color = "red";
+  } else {
+    message.textContent = "✅ Réservation enregistrée !";
+    message.style.color = "green";
+    form.reset();
+  }
+});
+</script>
