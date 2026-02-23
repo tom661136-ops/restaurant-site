@@ -8,7 +8,8 @@
 
 <h1>Réserver une table</h1>
 
-<form>
+<form id="reservationForm">
+
   <label>Nom</label><br>
   <input type="text" name="name" required><br><br>
 
@@ -25,8 +26,11 @@
   <input type="number" name="guests" min="1" value="2" required><br><br>
 
   <button type="submit">Enregistrer</button>
+
 </form>
 
+
+<!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -35,20 +39,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const { createClient } = supabase;
 
   const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
-  const supabaseKey = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey"; // ← colle ta vraie clé ici
+  const supabaseKey = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey"; // ← mets ta vraie clé ici
 
   const client = createClient(supabaseUrl, supabaseKey);
 
-  const form = document.querySelector("form");
+  const form = document.getElementById("reservationForm");
+
+  if (!form) {
+    console.error("Formulaire introuvable !");
+    return;
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const name = form.querySelector('input[name="name"]').value;
-    const email = form.querySelector('input[name="email"]').value;
-    const date = form.querySelector('input[name="date"]').value;
-    const time = form.querySelector('input[name="time"]').value;
-    const guests = form.querySelector('input[name="guests"]').value;
+    const name = form.querySelector('[name="name"]').value;
+    const email = form.querySelector('[name="email"]').value;
+    const date = form.querySelector('[name="date"]').value;
+    const time = form.querySelector('[name="time"]').value;
+    const guests = form.querySelector('[name="guests"]').value;
 
     const { error } = await client
       .from("reservations")
