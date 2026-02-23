@@ -1,42 +1,39 @@
-<!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const { createClient } = supabase;
+document.addEventListener("DOMContentLoaded", () => {
 
-// 🔗 TON URL SUPABASE
-const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
+  const { createClient } = supabase;
 
-// 🔑 TA PUBLISHABLE KEY (celle qui commence par sb_publishable_)
-const supabaseKey = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey";
+  const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
+  const supabaseKey = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey";
 
-const client = createClient(supabaseUrl, supabaseKey);
+  const client = createClient(supabaseUrl, supabaseKey);
 
-// Formulaire
-const form = document.querySelector("form");
-const message = document.createElement("p");
-form.appendChild(message);
+  const form = document.querySelector("form");
+  const message = document.createElement("p");
+  form.appendChild(message);
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const name = form.querySelector('input[name="name"]').value;
-  const email = form.querySelector('input[name="email"]').value;
-  const date = form.querySelector('input[name="date"]').value;
-  const time = form.querySelector('input[name="time"]').value;
-  const guests = form.querySelector('input[name="guests"]').value;
+    const name = form.querySelector('input[name="name"]').value;
+    const email = form.querySelector('input[name="email"]').value;
+    const date = form.querySelector('input[name="date"]').value;
+    const time = form.querySelector('input[name="time"]').value;
+    const guests = form.querySelector('input[name="guests"]').value;
 
-  const { error } = await client
-    .from("reservations")
-    .insert([{ name, email, date, time, guests }]);
+    const { error } = await client
+      .from("reservations")
+      .insert([{ name, email, date, time, guests }]);
 
-  if (error) {
-    message.textContent = "Erreur : " + error.message;
-    message.style.color = "red";
-  } else {
-    message.textContent = "✅ Réservation enregistrée !";
-    message.style.color = "green";
-    form.reset();
-  }
+    if (error) {
+      message.textContent = "Erreur : " + error.message;
+    } else {
+      message.textContent = "Réservation enregistrée !";
+      form.reset();
+    }
+  });
+
 });
 </script>
