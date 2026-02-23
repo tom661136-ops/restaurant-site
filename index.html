@@ -1,50 +1,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabaseUrl = "https://yygmxdpaskzubmicfpyt.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5Z214ZHBzYWt6dWJtaWNmcHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NjI0MDAsImV4cCI6MjA4NzQzODQwMH0.tPyu6K0Z5Vkgj4G3dyzhzLYEtwWSTXhp46SJ8V_oi_c;
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const { createClient } = supabase;
 
-const form = document.querySelector("form");
-const guestsInput = document.querySelector("input[type='number']");
-const depositDisplay = document.querySelector("#deposit-total");
+const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
+const supabaseKey = "TA_CLE_ANON_ICI";  // colle ta clé ici entre guillemets
 
-guestsInput.addEventListener("input", () => {
-  const guests = parseInt(guestsInput.value) || 0;
-  const total = guests * 10;
-  depositDisplay.textContent = total + " €";
-});
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const name = document.querySelector("input[placeholder='Nom']").value;
-  const email = document.querySelector("input[placeholder='Email']").value;
-  const date = document.querySelector("input[type='date']").value;
-  const time = document.querySelector("input[type='time']").value;
-  const guests = parseInt(guestsInput.value) || 0;
-  const deposit = guests * 10;
-
-  const { error } = await supabase
-    .from("reservations")
-    .insert([
-      {
-        name: name,
-        email: email,
-        date: date,
-        time: time,
-        guests: guests,
-        deposit_cents: deposit * 100,
-        payment_status: "pending"
-      }
-    ]);
-
-  if (error) {
-    alert("Erreur : " + error.message);
-  } else {
-    alert("Réservation enregistrée !");
-    form.reset();
-    depositDisplay.textContent = "0 €";
-  }
-});
+const client = createClient(supabaseUrl, supabaseKey);
 </script>
