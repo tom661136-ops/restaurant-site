@@ -1,18 +1,22 @@
+<!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
   const { createClient } = supabase;
 
   const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
-  const supabaseKey = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey";
+  const supabaseKey = "TA_PUBLISHABLE_KEY_ICI";
 
   const client = createClient(supabaseUrl, supabaseKey);
 
   const form = document.querySelector("form");
-  const message = document.createElement("p");
-  form.appendChild(message);
+
+  if (!form) {
+    console.error("Formulaire introuvable !");
+    return;
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -28,9 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
       .insert([{ name, email, date, time, guests }]);
 
     if (error) {
-      message.textContent = "Erreur : " + error.message;
+      alert("Erreur : " + error.message);
     } else {
-      message.textContent = "Réservation enregistrée !";
+      alert("Réservation enregistrée !");
       form.reset();
     }
   });
