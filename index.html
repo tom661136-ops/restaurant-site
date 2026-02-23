@@ -1,31 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Réservation Restaurant</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
+    label { display:block; margin-top: 12px; }
+    input { width: 100%; padding: 10px; margin-top: 6px; }
+    button { margin-top: 16px; padding: 12px 16px; cursor: pointer; }
+    .row { display:flex; gap:12px; }
+    .row > div { flex:1; }
+    .info { margin-top: 12px; padding: 10px; background: #f3f3f3; }
+    .ok { background:#e9ffe9; padding:10px; margin-top:12px; }
+    .err { background:#ffe9e9; padding:10px; margin-top:12px; }
+  </style>
 </head>
 <body>
 
-<h1>Réserver une table</h1>
+  <h1>Réserver une table</h1>
 
-<form>
-  <label>Nom :</label><br>
-  <input type="text" required><br><br>
+  <div class="info">
+    Acompte : <b>10 € / personne</b> (calculé automatiquement)
+  </div>
 
-  <label>Email :</label><br>
-  <input type="email" required><br><br>
+  <form id="reservationForm">
+    <label>Nom</label>
+    <input type="text" id="name" required />
 
-  <label>Date :</label><br>
-  <input type="date" required><br><br>
+    <label>Email</label>
+    <input type="email" id="email" required />
 
-  <label>Heure :</label><br>
-  <input type="time" required><br><br>
+    <div class="row">
+      <div>
+        <label>Date</label>
+        <input type="date" id="date" required />
+      </div>
+      <div>
+        <label>Heure</label>
+        <input type="time" id="time" required />
+      </div>
+    </div>
 
-  <label>Nombre de personnes :</label><br>
-  <input type="number" min="1" required><br><br>
+    <label>Nombre de personnes</label>
+    <input type="number" id="guests" min="1" max="20" value="2" required />
 
-  <button type="submit">Réserver</button>
-</form>
+    <div class="info" id="depositPreview">Acompte total : 20 €</div>
+
+    <button type="submit" id="btn">Enregistrer (pending)</button>
+    <div id="msg"></div>
+  </form>
+
+  <script>
+    const SUPABASE_URL = "https://yygmdpsakzubmicfpyt.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey";
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const form = document.getElementById("reservationForm");
+    const msg = document.getElementById("msg");
+    const btn = document.getElementById("btn");
+    const guestsEl = document.getElementById("guests");
+    const depositPreview = document.getElementById("depositPreview");
+
+    function updateDepositPreview() {
+      const guests = Number(guestsEl.value || 0);
+      depositPreview.textContent = `Acompte total : ${guests * 10} €`;
+    }
+    guestsEl.addEventListener("input", updateDepositPreview);
+    updateDepositPreview();
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.innerHTML = "";
+      btn.disabled = true;
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+      const guests = Number(document.getElementById("guests").value);
+
+      const deposit_cents = guests * 1000;
+
+      const { error } = await db.from("reservations").insert([{
+        name, email, date, time, guests,
+        deposit_cents,
+        payment_status: "pending"
+      }]);
+
+      if (error) {
+        msg.innerHTML = `<div class="err">Erreur: ${error.message}</div>`;
+      } else {
+        msg.innerHTML = `<div class="ok">✅ Réservation enregistrée (pending).</div>`;
+        form.reset();
+        guestsEl.value = 2;
+        updateDepositPreview();
+      }
+
+      btn.disabled = false;
+    });
+  </script>
 
 </body>
 </html>
