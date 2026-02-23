@@ -76,6 +76,23 @@ form.addEventListener("submit", async (e) => {
   }
 });
 </script>
+<form>
+   ...
+</form>
 
+<!-- SUPABASE ICI -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const { createClient } = supabase;
+
+const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl5Z214ZHBzYWt6dWJtaWNmcHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NjI0MDAsImV4cCI6MjA4NzQzODQwMH0.tPyu6K0Z5Vkgj4G3dyzhzLYEtwWSTXhp46SJ8V_oi_c";
+
+const client = createClient(supabaseUrl, supabaseKey);
+</script>
+
+</body>
+</html>
 </body>
 </html>
