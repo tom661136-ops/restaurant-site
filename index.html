@@ -1,21 +1,34 @@
-fetch("https://script.google.com/macros/s/AKfycbzSgMqL6uqRhZgc454EWXQrxtD0KHRczq9E20wmbb59LM6fKpH2jCMTzqfVjw74fSOS/exec", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    name,
-    email,
-    date,
-    time,
-    guests,
-    deposit
+<script>
+document.querySelector("form").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const name = document.querySelector("input[name='name']").value;
+  const email = document.querySelector("input[name='email']").value;
+  const date = document.querySelector("input[name='date']").value;
+  const time = document.querySelector("input[name='time']").value;
+  const guests = document.querySelector("input[name='guests']").value;
+  const deposit = guests * 10;
+
+  fetch("https://script.google.com/macros/s/AKfycbzSgMqL6uqRhZgc454EWXQrxtD0KHRczq9E20wmbb59LM6fKpH2jCMTzqfVjw74fSOS/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name,
+      email,
+      date,
+      time,
+      guests,
+      deposit
+    })
   })
-})
-.then(res => res.json())
-.then(data => {
-  alert("Réservation enregistrée !");
-})
-.catch(err => {
-  alert("Erreur : " + err);
+  .then(res => res.json())
+  .then(data => {
+    alert("Réservation enregistrée !");
+  })
+  .catch(err => {
+    alert("Erreur : " + err);
+  });
 });
+</script>
