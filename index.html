@@ -157,5 +157,54 @@ console.log("ERROR:", error);
       });
     });
   </script>
+  <!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+
+  const { createClient } = supabase;
+
+  const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
+
+  const supabaseKey = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey"; 
+  // ⚠️ COLLE ICI TA VRAIE PUBLISHABLE KEY ENTRE LES GUILLEMETS
+
+  if (!supabaseKey) {
+    console.error("Publishable key manquante.");
+    return;
+  }
+
+  const client = createClient(supabaseUrl, supabaseKey);
+
+  const form = document.querySelector("form");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = form.querySelector('input[name="name"]').value;
+    const email = form.querySelector('input[name="email"]').value;
+    const date = form.querySelector('input[name="date"]').value;
+    const time = form.querySelector('input[name="time"]').value;
+    const guests = form.querySelector('input[name="guests"]').value;
+
+    const { data, error } = await client
+      .from("reservations")
+      .insert([{ name, email, date, time, guests }])
+      .select();
+
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
+
+    if (error) {
+      alert("Erreur : " + error.message);
+    } else {
+      alert("Réservation enregistrée !");
+      form.reset();
+    }
+  });
+
+});
+</script>
 </body>
 </html>
