@@ -125,9 +125,13 @@
           // debug mini (pour vérifier qu’on exécute bien le code)
           debugInfo.textContent = "Envoi vers Supabase…";
 
-          const { data, error } = await client
-            .from("reservations")
-            .insert([payload])
+         const { data, error } = await client
+  .from("reservations")
+  .insert([payload])
+  .select();
+
+console.log("DATA:", data);
+console.log("ERROR:", error);
             .select();
 
           if (error) {
