@@ -1,46 +1,75 @@
-<script>
-document.querySelector("form").addEventListener("submit", function(e) {
-  e.preventDefault();
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Réservation Restaurant</title>
+</head>
 
-  const name = document.querySelector("input[name='name']").value;
-  const email = document.querySelector("input[name='email']").value;
-  const date = document.querySelector("input[name='date']").value;
-  const time = document.querySelector("input[name='time']").value;
-  const guests = document.querySelector("input[name='guests']").value;
-  const deposit = guests * 10;
+<body>
 
-  fetch("https://script.google.com/macros/s/AKfycbzSgMqL6uqRhZgc454EWXQrxtD0KHRczq9E20wmbb59LM6fKpH2jCMTzqfVjw74fSOS/exec", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      name,
-      email,
-      date,
-      time,
-      guests,
-      deposit
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    alert("Réservation enregistrée !");
-  })
-  .catch(err => {
-    alert("Erreur : " + err);
-  });
-});
-</script>
+<h1>Réserver une table</h1>
+
+<form id="reservationForm">
+
+  <label>Nom</label><br>
+  <input type="text" id="name" required><br><br>
+
+  <label>Email</label><br>
+  <input type="email" id="email" required><br><br>
+
+  <label>Date</label><br>
+  <input type="date" id="date" required><br><br>
+
+  <label>Heure</label><br>
+  <input type="time" id="time" required><br><br>
+
+  <label>Nombre de personnes</label><br>
+  <input type="number" id="guests" min="1" required><br><br>
+
+  <button type="submit">Enregistrer</button>
+
+</form>
+
+<p id="message"></p>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-  const form = document.querySelector("form");
+  const form = document.getElementById("reservationForm");
+  const message = document.getElementById("message");
 
-  form.addEventListener("submit", function(e) {
+  form.addEventListener("submit", function (e) {
     e.preventDefault();
-    alert("Test OK");
+
+    const data = {
+      name: document.getElementById("name").value,
+      email: document.getElementById("email").value,
+      date: document.getElementById("date").value,
+      time: document.getElementById("time").value,
+      guests: document.getElementById("guests").value,
+      deposit: document.getElementById("guests").value * 10
+    };
+
+    fetch("https://script.google.com/macros/s/AKfycbzSgMqL6uqRhZgc454EWXQrxtD0KHRczq9E20wmbb59LM6fKpH2jCMTzqfVjw74fSOS/exec", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+      message.innerText = "✅ Réservation enregistrée !";
+      form.reset();
+    })
+    .catch(error => {
+      message.innerText = "❌ Erreur : " + error;
+    });
+
   });
 
 });
 </script>
+
+</body>
+</html>
