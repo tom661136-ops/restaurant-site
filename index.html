@@ -1,210 +1,37 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Réservation Restaurant</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#fff; margin:0; }
-    .wrap { max-width: 900px; margin: 40px auto; padding: 0 16px; }
-    h1 { font-size: 44px; margin: 0 0 18px; }
-    .note { background:#f2f2f2; padding: 12px 14px; margin: 10px 0 18px; }
-    label { display:block; margin: 14px 0 6px; font-weight: 600; }
-    input { width: 100%; padding: 10px; font-size: 16px; box-sizing: border-box; }
-    .row { display:flex; gap: 14px; }
-    .row > div { flex:1; }
-    .total { background:#f2f2f2; padding: 12px 14px; margin: 18px 0; font-weight: 700; }
-    button { padding: 10px 14px; font-size: 16px; cursor:pointer; }
-    .msg { margin-top: 14px; padding: 10px 12px; }
-    .ok { background:#e8fff0; border:1px solid #b7f3cc; }
-    .err { background:#ffecec; border:1px solid #ffb3b3; }
-    .small { font-size: 13px; color:#444; margin-top: 6px; }
-  </style>
-</head>
-
-<body>
-  <div class="wrap">
-    <h1>Réserver une table</h1>
-
-    <div class="note">
-      Acompte : <strong>10 € / personne</strong> (calculé automatiquement)
-    </div>
-
-    <form id="reservationForm">
-      <label for="name">Nom</label>
-      <input id="name" name="name" required />
-
-      <label for="email">Email</label>
-      <input id="email" name="email" type="email" required />
-
-      <div class="row">
-        <div>
-          <label for="date">Date</label>
-          <input id="date" name="date" type="date" required />
-        </div>
-        <div>
-          <label for="time">Heure</label>
-          <input id="time" name="time" type="time" required />
-        </div>
-      </div>
-
-      <label for="guests">Nombre de personnes</label>
-      <input id="guests" name="guests" type="number" min="1" value="2" required />
-
-      <div class="total">
-        Acompte total : <span id="depositTotal">20</span> €
-      </div>
-
-      <button id="btnSave" type="submit">Enregistrer</button>
-      <div class="small" id="debugInfo"></div>
-
-      <div id="message" class="msg" style="display:none;"></div>
-    </form>
-  </div>
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // ====== CONFIG SUPABASE ======
-      const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
-      const supabaseKey = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey"; // sb_publishable_...
-
-      // sécurité basique: si tu as oublié de remplacer la key
-      if (!supabaseKey || supabaseKey.includes("sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey")) {
-        const dbg = document.getElementById("debugInfo");
-        dbg.textContent = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey";
-        console.error("Publishable key manquante.");
-        return;
-      }
-
-      // init client
-      const client = supabase.createClient(supabaseUrl, supabaseKey);
-
-      // ====== UI ======
-      const form = document.getElementById("reservationForm");
-      const guestsEl = document.getElementById("guests");
-      const depositTotalEl = document.getElementById("depositTotal");
-      const messageEl = document.getElementById("message");
-      const btnSave = document.getElementById("btnSave");
-      const debugInfo = document.getElementById("debugInfo");
-
-      // calc acompte
-      function updateDeposit() {
-        const guests = parseInt(guestsEl.value || "0", 10);
-        const total = Math.max(0, guests) * 10;
-        depositTotalEl.textContent = total;
-      }
-      guestsEl.addEventListener("input", updateDeposit);
-      updateDeposit();
-
-      function showMessage(text, ok) {
-        messageEl.style.display = "block";
-        messageEl.textContent = text;
-        messageEl.className = "msg " + (ok ? "ok" : "err");
-      }
-
-      // ====== SUBMIT ======
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        btnSave.disabled = true;
-        btnSave.textContent = "Enregistrement…";
-        messageEl.style.display = "none";
-
-        const payload = {
-          name: document.getElementById("name").value.trim(),
-          email: document.getElementById("email").value.trim(),
-          date: document.getElementById("date").value,
-          time: document.getElementById("time").value,
-          guests: parseInt(document.getElementById("guests").value, 10)
-        };
-
-        try {
-          // debug mini (pour vérifier qu’on exécute bien le code)
-          debugInfo.textContent = "Envoi vers Supabase…";
-
-         const { data, error } = await client
-  .from("reservations")
-  .insert([payload])
-  .select();
-
-console.log("DATA:", data);
-console.log("ERROR:", error);
-            .select();
-
-          if (error) {
-            console.error("Supabase error:", error);
-            showMessage("Erreur Supabase : " + error.message, false);
-            debugInfo.textContent = "Erreur retournée par Supabase.";
-          } else {
-            console.log("Insert OK:", data);
-            showMessage("Réservation enregistrée ✅", true);
-            form.reset();
-            document.getElementById("guests").value = 2;
-            updateDeposit();
-            debugInfo.textContent = "OK.";
-          }
-        } catch (err) {
-          console.error("Fetch/Network error:", err);
-          showMessage("Erreur réseau : " + (err?.message || err), false);
-          debugInfo.textContent = "Erreur réseau (Failed to fetch).";
-        } finally {
-          btnSave.disabled = false;
-          btnSave.textContent = "Enregistrer";
-        }
-      });
-    });
-  </script>
-  <!-- Supabase CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
-
-  const { createClient } = supabase;
-
-  const supabaseUrl = "https://yygmxdpasakzubmicfpyt.supabase.co";
-
-  const supabaseKey = "sb_publishable_zU_EqPHk-epBhceNfV5aQg_V9bsyTey"; 
-  // ⚠️ COLLE ICI TA VRAIE PUBLISHABLE KEY ENTRE LES GUILLEMETS
-
-  if (!supabaseKey) {
-    console.error("Publishable key manquante.");
-    return;
-  }
-
-  const client = createClient(supabaseUrl, supabaseKey);
+document.addEventListener("DOMContentLoaded", () => {
 
   const form = document.querySelector("form");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const name = form.querySelector('input[name="name"]').value;
-    const email = form.querySelector('input[name="email"]').value;
-    const date = form.querySelector('input[name="date"]').value;
-    const time = form.querySelector('input[name="time"]').value;
-    const guests = form.querySelector('input[name="guests"]').value;
+    const data = {
+      name: form.querySelector('[name="name"]').value,
+      email: form.querySelector('[name="email"]').value,
+      date: form.querySelector('[name="date"]').value,
+      time: form.querySelector('[name="time"]').value,
+      guests: form.querySelector('[name="guests"]').value,
+      deposit: form.querySelector('[name="guests"]').value * 10
+    };
 
-    const { data, error } = await client
-      .from("reservations")
-      .insert([{ name, email, date, time, guests }])
-      .select();
+    try {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbyR4H-GTky6cXPY8opVlPf_B2wq2fnerXyJ7Ld76vresXRWIZetb76QhFtcXCoSBenv/exec", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
 
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
-
-    if (error) {
-      alert("Erreur : " + error.message);
-    } else {
-      alert("Réservation enregistrée !");
-      form.reset();
+      if (response.ok) {
+        alert("Réservation enregistrée !");
+        form.reset();
+      } else {
+        alert("Erreur lors de l'envoi");
+      }
+    } catch (err) {
+      alert("Erreur réseau");
+      console.error(err);
     }
   });
 
 });
 </script>
-</body>
-</html>
